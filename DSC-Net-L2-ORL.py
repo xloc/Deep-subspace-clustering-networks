@@ -3,7 +3,7 @@
 # Copyright Reserved!
 import tensorflow as tf
 import numpy as np
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 from tensorflow.contrib import layers
 import scipy.io as sio
 from scipy.sparse.linalg import svds
@@ -13,10 +13,11 @@ from sklearn.preprocessing import normalize
 from munkres import Munkres
 #import matlab.engine
 
+from path_config import join
+
 class ConvAE(object):
     def __init__(self, n_input, kernel_size, n_hidden, reg_constant1 = 1.0, re_constant2 = 1.0, batch_size = 200, reg = None, \
-                denoise = False, model_path = None, restore_path = None, \
-                logs_path = '/home/pan/workspace-eclipse/deep-subspace-clustering/models_face/logs'):
+                denoise = False, model_path = None, restore_path = None, logs_path = None):
         self.n_input = n_input
         self.kernel_size = kernel_size
         self.n_hidden = n_hidden
@@ -25,6 +26,8 @@ class ConvAE(object):
         self.model_path = model_path
         self.restore_path = restore_path
         self.iter = 0
+
+        assert logs_path != None
         
         #input required to be fed
         self.x = tf.placeholder(tf.float32, [None, n_input[0], n_input[1], 1])
@@ -292,7 +295,7 @@ def test_face(Img, Label, CAE, num_class):
 if __name__ == '__main__':
     
     # load face images and labels
-    data = sio.loadmat('/home/pan/workspace-eclipse/deep-subspace-clustering/face_datasets/ORL_32x32.mat')
+    data = sio.loadmat(join('Data', 'ORL_32x32.mat'))
     Img = data['fea']
     Label = data['gnd']     
     
@@ -315,9 +318,9 @@ if __name__ == '__main__':
         reg1 = 1.0
         reg2 = 0.2
          
-        model_path = '/home/pan/workspace-eclipse/deep-subspace-clustering/models_face/model-335-32x32-orl.ckpt' 
-        restore_path = '/home/pan/workspace-eclipse/deep-subspace-clustering/models_face/model-335-32x32-orl.ckpt' 
-        logs_path = '/home/pan/workspace-eclipse/deep-subspace-clustering/conv_3_l1_yaleb/ft/logs' 
+        model_path = join('pretrain-model-ORL','model-335-32x32-orl.ckpt')
+        restore_path = join('pretrain-model-ORL','model-335-32x32-orl.ckpt')
+        logs_path = join('..', 'conv_3_l1_yaleb/ft/logs' )
         tf.reset_default_graph()
         CAE = ConvAE(n_input=n_input, n_hidden=n_hidden, reg_constant1=reg1, re_constant2=reg2, \
                      kernel_size=kernel_size, batch_size=batch_size, model_path=model_path, restore_path=restore_path, logs_path=logs_path)
